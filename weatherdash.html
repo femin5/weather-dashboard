@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("weatherr.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #222;
+            transition: 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .theme-toggle {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #0c0d0d;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 0;
+        }
+
+        #cityInput {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .suggestions-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            max-height: 240px;
+            overflow-y: auto;
+            background: white;
+            color: #222;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .suggestion-item:hover,
+        .suggestion-item:focus {
+            background: #edf3ff;
+            outline: none;
+        }
+
+        .suggestion-message {
+            padding: 12px 15px;
+            color: #666;
+        }
+
+
+        .weather-card,
+        .forecast-section,
+        .favorites-section {
+            background: rgba(214, 205, 205, 0.229);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px #0001;
+        }
+
+        .weather-card h2,
+        .weather-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .weather-card p {
+            margin: 8px 0;
+        }
+
+        .forecast-section h3,
+        .favorites-section h3 {
+            margin-bottom: 12px;
+        }
+
+        .forecast-list {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .forecast-card {
+            background: #8f9eba;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .forecast-card p {
+            margin: 8px 0;
+        }
+
+
+        .error {
+            background: #fee2e2;
+            color: #b42318;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+
+
+        .favorite-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .favorite-item button {
+            background: #2c0909;
+        }
+
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+            border: 4px solid #ddd;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 15px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                #d5dbe5 25%,
+                #edf0f5 50%,
+                #d5dbe5 75%
+            );
+
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes skeletonLoading {
+            from {
+                background-position: 200% 0;
+            }
+
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        .weather-skeleton,
+        .forecast-skeleton {
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: rgba(214, 205, 205, 0.229);
+        }
+
+        .skeleton-title {
+            width: 180px;
+            height: 28px;
+            margin-bottom: 20px;
+        }
+
+        .skeleton-temp {
+            width: 100px;
+            height: 35px;
+            margin-bottom: 20px;
+        }
+
+        .skeleton-line {
+            width: 65%;
+            height: 16px;
+            margin-bottom: 14px;
+        }
+
+        .skeleton-forecast-cards {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .skeleton-forecast-card {
+            height: 115px;
+        }
+
+        .dark {
+            background-color: #111827;
+            color: #f9fafb;
+        }
+
+        .dark .weather-card,
+        .dark .forecast-section,
+        .dark .favorites-section,
+        .dark .weather-skeleton,
+        .dark .forecast-skeleton {
+            background: rgba(31, 41, 55, 0.95);
+            color: #f9fafb;
+        }
+
+        .dark .forecast-card {
+            background: #374151;
+        }
+
+        .dark .suggestions-list {
+            background: #1f2937;
+            color: #f9fafb;
+            border-color: #4b5563;
+        }
+
+        .dark .suggestion-item {
+            border-bottom-color: #374151;
+        }
+
+        .dark .suggestion-item:hover,
+        .dark .suggestion-item:focus {
+            background: #374151;
+        }
+
+        .dark .suggestion-message {
+            color: #d1d5db;
+        }
+
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 12px;
+            }
+
+            .forecast-list,
+            .skeleton-forecast-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .search-section {
+                flex-direction: column;
+            }
+
+            .search-input-wrapper {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script src="weather.js" defer></script>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="theme-toggle">
+            <button id="themeBtn">Dark</button>
+        </div>
+
+        <h1>Weather Dashboard</h1>
+
+
+        <div class="search-section">
+
+            <div class="search-input-wrapper">
+                <input
+                    type="text"
+                    id="cityInput"
+                    placeholder="Enter city name..."
+                    autocomplete="off"
+                >
+
+                <div
+                    id="suggestionsList"
+                    class="suggestions-list"
+                    role="listbox"
+                ></div>
+            </div>
+
+            <button id="searchBtn">Search Weather</button>
+
+        </div>
+
+        <!-- Loading spinner -->
+
+        <div id="loading" style="display: none;" role="status">
+            <div class="spinner"></div>
+            <p style="text-align: center;">Loading weather...</p>
+        </div>
+
+        <!-- Weather skeleton -->
+
+        <div
+            id="weatherSkeleton"
+            class="weather-skeleton"
+            style="display: none;"
+  
+        >
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-temp"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line"></div>
+        </div>
+
+        <!-- Error message -->
+
+        <div
+            id="errorMsg"
+            class="error"
+            style="display: none;"
+            role="alert"
+        ></div>
+
+        <!-- Current weather -->
+
+        <div
+            id="weatherCard"
+            class="weather-card"
+            style="display: none;"
+        ></div>
+
+        <!-- Forecast section -->
+
+        <div class="forecast-section">
+
+            <h3>5-Day Forecast</h3>
+
+
+            <div
+                id="forecastSkeleton"
+                class="forecast-skeleton"
+                style="display: none;"
+               
+            >
+                <div class="skeleton-title skeleton"></div>
+
+                <div class="skeleton-forecast-cards">
+                    <div class="skeleton skeleton-forecast-card"></div>
+                    <div class="skeleton skeleton-forecast-card"></div>
+                    <div class="skeleton skeleton-forecast-card"></div>
+                    <div class="skeleton skeleton-forecast-card"></div>
+                    <div class="skeleton skeleton-forecast-card"></div>
+                </div>
+            </div>
+
+            <div id="forecastList" class="forecast-list"></div>
+
+        </div>
+
+        <div class="favorites-section">
+
+            <h3>Favorites</h3>
+
+            <div id="favoritesList"></div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+```
