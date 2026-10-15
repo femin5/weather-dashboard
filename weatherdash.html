@@ -316,16 +316,11 @@
 <body>
 
     <div class="container">
-
         <div class="theme-toggle">
             <button id="themeBtn">Dark</button>
         </div>
-
         <h1>Weather Dashboard</h1>
-
-
         <div class="search-section">
-
             <div class="search-input-wrapper">
                 <input
                     type="text"
@@ -333,32 +328,22 @@
                     placeholder="Enter city name..."
                     autocomplete="off"
                 >
-
                 <div
                     id="suggestionsList"
                     class="suggestions-list"
                     role="listbox"
                 ></div>
             </div>
-
             <button id="searchBtn">Search Weather</button>
-
         </div>
-
-        <!-- Loading spinner -->
-
         <div id="loading" style="display: none;" role="status">
             <div class="spinner"></div>
             <p style="text-align: center;">Loading weather...</p>
         </div>
-
-        <!-- Weather skeleton -->
-
         <div
             id="weatherSkeleton"
             class="weather-skeleton"
             style="display: none;"
-  
         >
             <div class="skeleton skeleton-title"></div>
             <div class="skeleton skeleton-temp"></div>
@@ -366,39 +351,25 @@
             <div class="skeleton skeleton-line"></div>
             <div class="skeleton skeleton-line"></div>
         </div>
-
-        <!-- Error message -->
-
-        <div
+         <div
             id="errorMsg"
             class="error"
             style="display: none;"
             role="alert"
         ></div>
-
-        <!-- Current weather -->
-
         <div
             id="weatherCard"
             class="weather-card"
             style="display: none;"
         ></div>
-
-        <!-- Forecast section -->
-
         <div class="forecast-section">
-
             <h3>5-Day Forecast</h3>
-
-
             <div
                 id="forecastSkeleton"
                 class="forecast-skeleton"
-                style="display: none;"
-               
+                style="display: none;"  
             >
                 <div class="skeleton-title skeleton"></div>
-
                 <div class="skeleton-forecast-cards">
                     <div class="skeleton skeleton-forecast-card"></div>
                     <div class="skeleton skeleton-forecast-card"></div>
@@ -407,21 +378,12 @@
                     <div class="skeleton skeleton-forecast-card"></div>
                 </div>
             </div>
-
             <div id="forecastList" class="forecast-list"></div>
-
         </div>
-
         <div class="favorites-section">
-
             <h3>Favorites</h3>
-
             <div id="favoritesList"></div>
-
         </div>
-
     </div>
-
 </body>
 </html>
-```
